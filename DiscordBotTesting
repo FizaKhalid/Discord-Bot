@@ -1,0 +1,83 @@
+const Discord = require('discord.js')
+const client = new Discord.Client()
+
+/*const fs = require('fs')
+
+client.commands = new Discord.Collection()
+
+const commandFiles = fs.readdirSync('./commands/').filter(file => file.endsWith('.js'))
+for (const file of commandFiles){
+    const command = require(`./commands/${file}`)
+    
+    client.commands.set(command.name, command)
+}*/
+
+client.on('ready', () => {
+    console.log("Connected as " + client.user.tag)
+
+    client.user.setActivity("with JavaScript")
+
+    client.guilds.cache.forEach((guild) => {
+        console.log(guild.name)
+        guild.channels.cache.forEach((channel) => {
+            console.log(` - ${channel.name} ${channel.type} ${channel.id}`)
+        })
+        //Testing channel id: 764947760000139276
+    })
+    testingChannelID = "764947760000139276"
+
+    let testingChannel = client.channels.cache.get(testingChannelID)
+})
+
+client.on('message', (receivedMessage) => {
+    if (receivedMessage.author == client.user) {
+        return
+    }
+    if (receivedMessage.content.startsWith("!")) {
+        processCommand(receivedMessage)
+    }
+})
+        
+function processCommand(receivedMessage) {
+    let fullCommand = receivedMessage.content.substr(1)
+    let splitCommand = fullCommand.split(" ")
+    let primaryCommand = splitCommand[0]
+    let arguments = splitCommand.slice(1)
+
+    if (primaryCommand == 'ping') {
+        pingCommand(arguments, receivedMessage)
+    }
+    else if (primaryCommand == "multiply") {
+        multiplyCommand(arguments, receivedMessage)
+    }else {
+        client.channels.cache.get(testingChannelID).send("I'm not sure what you're trying. Retry a command")
+    }
+}
+
+function pingCommand(arguments, receivedMessage) {
+    if (client.member.roles.find(r => r.name === "Toronto Raptors") || client.member.roles.find(r => r.name === "Miami Heat")){ 
+        if (arguments.length != 0) {
+            client.channels.cache.get(testingChannelID).send("I'm not sure what you're trying to say! Try writing '!pong'")
+            return
+        }else {
+            client.channels.cache.get(testingChannelID).send("Pong!")
+        }
+    }else {
+        client.channels.cache.get(testingChannelID).send("You can't use this command because you don't have the right perimissions.")
+    }
+}
+
+function multiplyCommand(arguments, receivedMessage) {
+    if (arguments.length < 2) {
+        client.channels.cache.get(testingChannelID).send("Not enough arguments. Try '!multiply 2 5")
+        return
+    }
+    let product = 1
+    arguments.forEach((value) => {
+        product = product * parseFloat(value)
+    })
+    client.channels.cache.get(testingChannelID).send("The product of the " + arguments + " is "  + product.toString())
+
+}
+
+client.login("NzU5NDg2NDUzNjIwMTQ2MjA2.X2-M4Q.mQCTRt2P50NteT0yD6cJIg_me8I")
